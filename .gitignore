@@ -1,3 +1,13 @@
+# Output directories
+Debug
+Release
+
+# Per-user files
+*.suo
+*.user
+*.sdf
+*.filters
+
 # Compiled Object files
 *.slo
 *.lo
