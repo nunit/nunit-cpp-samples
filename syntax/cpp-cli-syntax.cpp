@@ -656,5 +656,23 @@ namespace NUnitSamples
 		{
 			throw gcnew System::ArgumentException();
 		}
+
+        [Test]
+        void AssertPassWithMessage()
+        {
+            Assert::Pass( "This test has passed" );
+        }
+
+        [Test]
+        void AssertPassWithMessageAndArguments()
+        {
+            Assert::Pass( "This test has passed at {0}", System::DateTime::Now );
+        }
+
+        [Test]
+        void AssumeWithMessage()
+        {
+            Assume::That( 2 + 2, Is::EqualTo( 4 ), "This computer can't add" );
+        }
 	};
 }
