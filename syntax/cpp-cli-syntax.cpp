@@ -19,7 +19,7 @@ namespace NUnitSamples
 		[Test]
 		void IsNull()
 		{
-			Object ^nada = nullptr;
+			String ^nada = nullptr;
 
 			// Classic syntax
 			Assert::IsNull(nada);
@@ -94,17 +94,20 @@ namespace NUnitSamples
 		[Test]
 		void EmptyStringTests()
 		{
+            String^ empty = "";
+            String^ hello = "Hello!";
+
 			// Classic syntax
-			Assert::IsEmpty("");
-			Assert::IsNotEmpty("Hello!");
+			Assert::IsEmpty(empty);
+			Assert::IsNotEmpty(hello);
 
 			// Constraint Syntax
-			Assert::That("", Is::Empty);
-			Assert::That("Hello!", Is::Not->Empty);
+            Assert::That(empty, Is::Empty);
+            Assert::That(hello, Is::Not->Empty);
 
 			// Inherited syntax
-			Expect("", Empty);
-			Expect("Hello!", Not->Empty);
+            Expect(empty, Empty);
+            Expect(hello, Not->Empty);
 		}
 
 		[Test]
@@ -138,40 +141,44 @@ namespace NUnitSamples
 			Assert::That(greeting, Is::Not->TypeOf(int::typeid));
 			
 			// Inherited syntax
-			Expect( "Hello", TypeOf(String::typeid));
-			Expect( "Hello", Not->TypeOf(int::typeid));
+			Expect(greeting, TypeOf(String::typeid));
+			Expect(greeting, Not->TypeOf(int::typeid));
 		}
 
 		[Test]
 		void InstanceOfTests()
-		{
+        {
+            String^ greeting = "Hello";
+
 			// Classic syntax
-			Assert::IsInstanceOf(String::typeid, "Hello");
+			Assert::IsInstanceOf(String::typeid, greeting);
 			Assert::IsNotInstanceOf(String::typeid, 5);
 
 			// Constraint Syntax
-			Assert::That("Hello", Is::InstanceOf(String::typeid));
+			Assert::That(greeting, Is::InstanceOf(String::typeid));
 			Assert::That(5, Is::Not->InstanceOf(String::typeid));
 
 			// Inherited syntax
-			Expect("Hello", InstanceOf(String::typeid));
+			Expect(greeting, InstanceOf(String::typeid));
 			Expect(5, Not->InstanceOf(String::typeid));
 		}
 
 		[Test]
 		void AssignableFromTypeTests()
-		{
+        {
+            String^ greeting = "Hello";
+
 			// Classic syntax
-			Assert::IsAssignableFrom(String::typeid, "Hello");
+			Assert::IsAssignableFrom(String::typeid, greeting);
 			Assert::IsNotAssignableFrom(String::typeid, 5);
 
 			// Constraint Syntax
-			Assert::That( "Hello", Is::AssignableFrom(String::typeid));
-			Assert::That( 5, Is::Not->AssignableFrom(String::typeid));
+			Assert::That(greeting, Is::AssignableFrom(String::typeid));
+			Assert::That(5, Is::Not->AssignableFrom(String::typeid));
 			
 			// Inherited syntax
-			Expect( "Hello", AssignableFrom(String::typeid));
-			Expect( 5, Not->AssignableFrom(String::typeid));
+			Expect(greeting, AssignableFrom(String::typeid));
+			Expect(5, Not->AssignableFrom(String::typeid));
 		}
 
 		[Test]
@@ -184,12 +191,12 @@ namespace NUnitSamples
 			StringAssert::Contains("World", phrase);
 			
 			// Constraint Syntax
-			Assert::That(phrase, Is::StringContaining("World"));
+			Assert::That(phrase, Does::Contain("World"));
 			// Only available using new syntax
-			Assert::That(phrase, Is::Not->StringContaining("goodbye"));
-			Assert::That(phrase, Is::StringContaining("WORLD")->IgnoreCase);
-			Assert::That(phrase, Is::Not->StringContaining("BYE")->IgnoreCase);
-			Assert::That(strings, Is::All->StringContaining( "b" ) );
+			Assert::That(phrase, Does::Not->Contain("goodbye"));
+			Assert::That(phrase, Does::Contain("WORLD")->IgnoreCase);
+			Assert::That(phrase, Does::Not->Contain("BYE")->IgnoreCase);
+			Assert::That(strings, Is::All->Contain( "b" ) );
 
 			// Inherited syntax
 			Expect(phrase, Contains("World"));
@@ -210,12 +217,12 @@ namespace NUnitSamples
 			StringAssert::StartsWith("Hello", phrase);
 
 			// Constraint Syntax
-			Assert::That(phrase, Is::StringStarting("Hello"));
+			Assert::That(phrase, Does::StartWith("Hello"));
 			// Only available using new syntax
-			Assert::That(phrase, Is::Not->StringStarting("Hi!"));
-			Assert::That(phrase, Is::StringStarting("HeLLo")->IgnoreCase);
-			Assert::That(phrase, Is::Not->StringStarting("HI")->IgnoreCase);
-			Assert::That(greetings, Is::All->StringStarting("h")->IgnoreCase);
+			Assert::That(phrase, Does::Not->StartWith("Hi!"));
+			Assert::That(phrase, Does::StartWith("HeLLo")->IgnoreCase);
+            Assert::That( phrase, Does::Not->StartWith( "HI" )->IgnoreCase );
+			Assert::That(greetings, Is::All->StartWith("h")->IgnoreCase);
 
 			// Inherited syntax
 			Expect(phrase, StartsWith("Hello"));
@@ -236,11 +243,11 @@ namespace NUnitSamples
 			StringAssert::EndsWith("!", phrase);
 
 			// Constraint Syntax
-			Assert::That(phrase, Is::StringEnding("!"));
+			Assert::That(phrase, Does::EndWith("!"));
 			// Only available using new syntax
-			Assert::That(phrase, Is::Not->StringEnding("?"));
-			Assert::That(phrase, Is::StringEnding("WORLD!")->IgnoreCase);
-			Assert::That(greetings, Is::All->StringEnding("!"));
+			Assert::That(phrase, Does::Not->EndWith("?"));
+			Assert::That(phrase, Does::EndWith("WORLD!")->IgnoreCase);
+			Assert::That(greetings, Is::All->EndsWith("!"));
 		
 			// Inherited syntax
 			Expect(phrase, EndsWith("!"));
@@ -288,12 +295,13 @@ namespace NUnitSamples
 			StringAssert::IsMatch( "Now.*come", phrase );
 
 			// Constraint Syntax
-			Assert::That( phrase, Is::StringMatching( "all good men" ) );
-			Assert::That( phrase, Is::StringMatching( "Now.*come" ) );
+			Assert::That(phrase, Does::Match("all good men"));
+            Assert::That(phrase, Does::Match("Now.*come"));
+
 			// Only available using new syntax
-			Assert::That(phrase, Is::Not->StringMatching("all.*men.*good"));
-			Assert::That(phrase, Is::StringMatching("ALL")->IgnoreCase);
-			Assert::That(quotes, Text::All->Matches("never")->IgnoreCase);
+			Assert::That(phrase, Does::Not->Match("all.*men.*good"));
+			Assert::That(phrase, Does::Match("ALL")->IgnoreCase);
+			Assert::That(quotes, Has::All->Matches("never")->IgnoreCase);
 		
 			// Inherited syntax
 			Expect( phrase, Matches( "all good men" ) );
@@ -410,7 +418,7 @@ namespace NUnitSamples
 			// Only available using new syntax
 			Assert::That(strings, Is::Not->Unique);
 			Assert::That(ints, Is::All->GreaterThan(0));
-			Assert::That(strings, Text::All->Contains( "a" ) );
+			Assert::That(strings, Has::All->Contains( "a" ) );
 			Assert::That(strings, Has::Some->StartsWith( "ba" ) );
 		
 			// Inherited syntax
@@ -546,17 +554,18 @@ namespace NUnitSamples
 		[Test]
 		void PropertyTests()
 		{
+            String^ greeting = "Hello";
 			array<String^>^ strings = { "abc", "bca", "xyz" };
 
 			// Constraint Syntax
-			Assert::That( "Hello", Has::Property("Length")->EqualTo(5) );
-			Assert::That( "Hello", Has::Length->EqualTo( 5 ) );
+            Assert::That( greeting, Has::Property( "Length" )->EqualTo( 5 ) );
+            Assert::That( greeting, Has::Length->EqualTo( 5 ) );
 			Assert::That( strings , Has::All->Property( "Length")->EqualTo(3) );
 			Assert::That( strings, Has::All->Length->EqualTo( 3 ) );
 
 			// Inherited syntax
-			Expect( "Hello", Property("Length")->EqualTo(5) );
-			Expect( "Hello", Length->EqualTo( 5 ) );
+            Expect( greeting, Property( "Length" )->EqualTo( 5 ) );
+            Expect( greeting, Length->EqualTo( 5 ) );
 			Expect( strings, All->Property("Length")->EqualTo(3) );
 			Expect( strings, All->Length->EqualTo( 3 ) );
 		}
