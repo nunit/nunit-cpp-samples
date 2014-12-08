@@ -417,7 +417,7 @@ namespace NUnitSamples
 			Assert::That(ints, Is::Unique);
 			// Only available using new syntax
 			Assert::That(strings, Is::Not->Unique);
-			Assert::That(ints, Is::All->GreaterThan(0));
+			Assert::That(ints, Is::All->GreaterThanOrEqualTo(1));
 			Assert::That(strings, Has::All->Contains( "a" ) );
 			Assert::That(strings, Has::Some->StartsWith( "ba" ) );
 		
@@ -428,7 +428,7 @@ namespace NUnitSamples
 			Expect(ints, Unique);
 			// Only available using new syntax
 			Expect(strings, Not->Unique);
-			Expect(ints, All->GreaterThan(0));
+			Expect(ints, All->GreaterThanOrEqualTo(1));
 			Expect(strings, All->Contains( "a" ) );
 			Expect(strings, Some->StartsWith( "ba" ) );
 		}
