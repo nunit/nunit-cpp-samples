@@ -25,3 +25,7 @@ Release
 # NUnit Files
 NUnit30Settings.xml
 TestResult.xml
+
+# NuGet Files
+tools/*
+!tools/packages.config

@@ -86,7 +86,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\..\nunit\bin\$(Configuration)\net-4.0\nunit.framework.dll</HintPath>
+      <HintPath>..\tools\NUnit\lib\net40\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
