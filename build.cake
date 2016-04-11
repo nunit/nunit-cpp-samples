@@ -9,7 +9,6 @@ var configuration = Argument("configuration", "Release");
 // DISCOVERY VARS
 //////////////////////////////////////////////////////////////////////
 
-string[] SolutionList = null;
 string[] ProjList = null;
 var PROJ_EXT = "*.vcxproj";
 
@@ -20,7 +19,6 @@ var PROJ_EXT = "*.vcxproj";
 var ROOT_DIR = Context.Environment.WorkingDirectory.FullPath;
 var TOOLS_DIR = ROOT_DIR + "/tools/";
 var NUNIT3_CONSOLE = TOOLS_DIR + "NUnit.ConsoleRunner/tools/nunit3-console.exe";
-var PACKAGES_CONFIG = TOOLS_DIR + "packages.config";
 
 //////////////////////////////////////////////////////////////////////
 // ERROR LOG
@@ -35,7 +33,6 @@ var ErrorDetail = new List<string>();
 Task("DiscoverSolutions")
 .Does(() =>
     {
-        SolutionList = System.IO.Directory.GetFiles(ROOT_DIR, "*.sln", SearchOption.AllDirectories);
         ProjList = System.IO.Directory.GetFiles(ROOT_DIR, PROJ_EXT, SearchOption.AllDirectories);
     });
 
@@ -68,7 +65,7 @@ Task("Build")
             {
                 BuildProject(proj, configuration);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // Just record and continue, since samples are independent
                 ErrorDetail.Add("     * " + projName + " build failed.");
