@@ -1,9 +1,3 @@
-// ****************************************************************
-// This is free software licensed under the NUnit license. You
-// may obtain a copy of the license as well as information regarding
-// copyright ownership at http://nunit.org
-// ****************************************************************
-
 using namespace NUnit::Framework;
 using NUnit::Framework::Is;
 using NUnit::Framework::List;
