@@ -61,7 +61,7 @@ namespace NUnitSamples
 
 			// Constraint Syntax
 			Assert::That(2+2==5, Is::False);
-			
+
 			// Inherited syntax
 			Expect(2+2==5, False);
 		}
@@ -79,7 +79,7 @@ namespace NUnitSamples
 			// Constraint Syntax
 			Assert::That(d, Is::NaN);
 			Assert::That(f, Is::NaN);
-			
+
 			// Inherited syntax
 			Expect(d, NaN);
 			Expect(f, NaN);
@@ -88,20 +88,20 @@ namespace NUnitSamples
 		[Test]
 		void EmptyStringTests()
 		{
-            String^ empty = "";
-            String^ hello = "Hello!";
+			String^ empty = "";
+			String^ hello = "Hello!";
 
 			// Classic syntax
 			Assert::IsEmpty(empty);
 			Assert::IsNotEmpty(hello);
 
 			// Constraint Syntax
-            Assert::That(empty, Is::Empty);
-            Assert::That(hello, Is::Not->Empty);
+			Assert::That(empty, Is::Empty);
+			Assert::That(hello, Is::Not->Empty);
 
 			// Inherited syntax
-            Expect(empty, Empty);
-            Expect(hello, Not->Empty);
+			Expect(empty, Empty);
+			Expect(hello, Not->Empty);
 		}
 
 		[Test]
@@ -133,7 +133,7 @@ namespace NUnitSamples
 			// Constraint Syntax
 			Assert::That(greeting, Is::TypeOf(String::typeid));
 			Assert::That(greeting, Is::Not->TypeOf(int::typeid));
-			
+
 			// Inherited syntax
 			Expect(greeting, TypeOf(String::typeid));
 			Expect(greeting, Not->TypeOf(int::typeid));
@@ -141,8 +141,8 @@ namespace NUnitSamples
 
 		[Test]
 		void InstanceOfTests()
-        {
-            String^ greeting = "Hello";
+		{
+			String^ greeting = "Hello";
 
 			// Classic syntax
 			Assert::IsInstanceOf(String::typeid, greeting);
@@ -159,8 +159,8 @@ namespace NUnitSamples
 
 		[Test]
 		void AssignableFromTypeTests()
-        {
-            String^ greeting = "Hello";
+		{
+			String^ greeting = "Hello";
 
 			// Classic syntax
 			Assert::IsAssignableFrom(String::typeid, greeting);
@@ -215,7 +215,7 @@ namespace NUnitSamples
 			// Only available using new syntax
 			Assert::That(phrase, Does::Not->StartWith("Hi!"));
 			Assert::That(phrase, Does::StartWith("HeLLo")->IgnoreCase);
-            Assert::That( phrase, Does::Not->StartWith( "HI" )->IgnoreCase );
+			Assert::That( phrase, Does::Not->StartWith( "HI" )->IgnoreCase );
 			Assert::That(greetings, Is::All->StartWith("h")->IgnoreCase);
 
 			// Inherited syntax
@@ -242,7 +242,7 @@ namespace NUnitSamples
 			Assert::That(phrase, Does::Not->EndWith("?"));
 			Assert::That(phrase, Does::EndWith("WORLD!")->IgnoreCase);
 			Assert::That(greetings, Is::All->EndsWith("!"));
-		
+
 			// Inherited syntax
 			Expect(phrase, EndsWith("!"));
 			// Only available using new syntax
@@ -258,7 +258,7 @@ namespace NUnitSamples
 
 			// Classic syntax
 			StringAssert::AreEqualIgnoringCase("hello world!",phrase);
-            
+
 			// Constraint Syntax
 			Assert::That(phrase, Is::EqualTo("hello world!")->IgnoreCase);
 			//Only available using new syntax
@@ -267,7 +267,7 @@ namespace NUnitSamples
 				Is::EqualTo(gcnew array<Object^> { "HELLO", "WORLD" })->IgnoreCase);
 			Assert::That(gcnew array<String^> {"HELLO", "Hello", "hello" },
 				Is::All->EqualTo( "hello" )->IgnoreCase);
-		            
+
 			// Inherited syntax
 			Expect(phrase, EqualTo("hello world!")->IgnoreCase);
 			//Only available using new syntax
@@ -290,13 +290,13 @@ namespace NUnitSamples
 
 			// Constraint Syntax
 			Assert::That(phrase, Does::Match("all good men"));
-            Assert::That(phrase, Does::Match("Now.*come"));
+			Assert::That(phrase, Does::Match("Now.*come"));
 
 			// Only available using new syntax
 			Assert::That(phrase, Does::Not->Match("all.*men.*good"));
 			Assert::That(phrase, Does::Match("ALL")->IgnoreCase);
 			Assert::That(quotes, Has::All->Matches("never")->IgnoreCase);
-		
+
 			// Inherited syntax
 			Expect( phrase, Matches( "all good men" ) );
 			Expect( phrase, Matches( "Now.*come" ) );
@@ -325,7 +325,7 @@ namespace NUnitSamples
 			Assert::That(i3, Is::EqualTo(d3));
 			Assert::That(2 + 2, Is::Not->EqualTo(5));
 			Assert::That(i3, Is::Not->EqualTo(iunequal));
-		
+
 			// Inherited syntax
 			Expect(2 + 2, EqualTo(4));
 			Expect(2 + 2 == 4);
@@ -344,7 +344,7 @@ namespace NUnitSamples
 			// Constraint Syntax
 			Assert::That(4.99L, Is::EqualTo(5.0L)->Within(0.05L));
 			Assert::That(4.99f, Is::EqualTo(5.0f)->Within(0.05f));
-		
+
 			// Inherited syntax
 			Expect(4.99L, EqualTo(5.0L)->Within(0.05L));
 			Expect(4.99f, EqualTo(5.0f)->Within(0.05f));
@@ -383,7 +383,7 @@ namespace NUnitSamples
 			Assert::That(3, Is::AtMost(7));
 			Assert::That(3, Is::LessThanOrEqualTo(3));
 			Assert::That(3, Is::AtMost(3));
-		
+
 			// Inherited syntax
 			Expect(3, LessThan(7));
 			Expect(3, LessThanOrEqualTo(7));
@@ -414,7 +414,7 @@ namespace NUnitSamples
 			Assert::That(ints, Is::All->GreaterThanOrEqualTo(1));
 			Assert::That(strings, Has::All->Contains( "a" ) );
 			Assert::That(strings, Has::Some->StartsWith( "ba" ) );
-		
+
 			// Inherited syntax
 			Expect(ints, All->Not->Null);
 			Expect(ints, All->InstanceOf(int::typeid));
@@ -441,7 +441,7 @@ namespace NUnitSamples
 			Assert::That(mixed, Has::Some->InstanceOf(String::typeid));
 			Assert::That(strings, Has::Some->StartsWith( "ba" ) );
 			Assert::That(strings, Has::Some->Not->StartsWith( "ba" ) );
-		
+
 			// Inherited syntax
 			Expect(mixed, Some->Null);
 			Expect(mixed, Some->InstanceOf(int::typeid));
@@ -463,7 +463,7 @@ namespace NUnitSamples
 			Assert::That(ints, Has::None->InstanceOf(String::typeid));
 			Assert::That(ints, Has::None->GreaterThan(99));
 			Assert::That(strings, Has::None->StartsWith( "qu" ) );
-		
+
 			// Inherited syntax
 			Expect(ints, None->Null);
 			Expect(ints, None->InstanceOf(String::typeid));
@@ -489,7 +489,7 @@ namespace NUnitSamples
 			Assert::That(sarray, Has::Member("b"));
 			Assert::That(sarray, Has::No->Member("x")); // Yuck!
 			Assert::That(sarray, !Has::Member("x"));
-		
+
 			// Inherited syntax
 			Expect(iarray, Contains(3));
 			Expect(sarray, Contains("b"));
@@ -507,7 +507,7 @@ namespace NUnitSamples
 			CollectionAssert::AreNotEquivalent(gcnew array<int> { 2, 2, 4, 3, 5 }, ints1to5);
 			CollectionAssert::AreNotEquivalent(gcnew array<int> { 2, 4, 3, 5 }, ints1to5);
 			CollectionAssert::AreNotEquivalent(gcnew array<int> { 2, 2, 1, 1, 4, 3, 5 }, ints1to5);
-		
+
 			// Constraint Syntax
 			Assert::That(gcnew array<int> { 2, 1, 4, 3, 5 }, Is::EquivalentTo(ints1to5));
 			Assert::That(gcnew array<int> { 2, 2, 4, 3, 5 }, Is::Not->EquivalentTo(ints1to5));
@@ -537,7 +537,7 @@ namespace NUnitSamples
 			Assert::That(gcnew array<int> { 1, 2, 3, 4, 5 }, Is::SubsetOf(ints1to5));
 			Assert::That(gcnew array<int> { 2, 4, 6 }, Is::Not->SubsetOf(ints1to5));
 			Assert::That(gcnew array<int> { 1, 2, 2, 2, 5 }, Is::Not->SubsetOf(ints1to5));
-		
+
 			// Inherited syntax
 			Expect(gcnew array<int> { 1, 3, 5 }, SubsetOf(ints1to5));
 			Expect(gcnew array<int> { 1, 2, 3, 4, 5 }, SubsetOf(ints1to5));
@@ -548,18 +548,18 @@ namespace NUnitSamples
 		[Test]
 		void PropertyTests()
 		{
-            String^ greeting = "Hello";
+			String^ greeting = "Hello";
 			array<String^>^ strings = { "abc", "bca", "xyz" };
 
 			// Constraint Syntax
-            Assert::That( greeting, Has::Property( "Length" )->EqualTo( 5 ) );
-            Assert::That( greeting, Has::Length->EqualTo( 5 ) );
+			Assert::That( greeting, Has::Property( "Length" )->EqualTo( 5 ) );
+			Assert::That( greeting, Has::Length->EqualTo( 5 ) );
 			Assert::That( strings , Has::All->Property( "Length")->EqualTo(3) );
 			Assert::That( strings, Has::All->Length->EqualTo( 3 ) );
 
 			// Inherited syntax
-            Expect( greeting, Property( "Length" )->EqualTo( 5 ) );
-            Expect( greeting, Length->EqualTo( 5 ) );
+			Expect( greeting, Property( "Length" )->EqualTo( 5 ) );
+			Expect( greeting, Length->EqualTo( 5 ) );
 			Expect( strings, All->Property("Length")->EqualTo(3) );
 			Expect( strings, All->Length->EqualTo( 3 ) );
 		}
@@ -651,22 +651,22 @@ namespace NUnitSamples
 			throw gcnew System::ArgumentException();
 		}
 
-        [Test]
-        void AssertPassWithMessage()
-        {
-            Assert::Pass( "This test has passed" );
-        }
+		[Test]
+		void AssertPassWithMessage()
+		{
+			Assert::Pass( "This test has passed" );
+		}
 
-        [Test]
-        void AssertPassWithMessageAndArguments()
-        {
-            Assert::Pass( "This test has passed at {0}", System::DateTime::Now );
-        }
+		[Test]
+		void AssertPassWithMessageAndArguments()
+		{
+			Assert::Pass( "This test has passed at {0}", System::DateTime::Now );
+		}
 
-        [Test]
-        void AssumeWithMessage()
-        {
-            Assume::That( 2 + 2, Is::EqualTo( 4 ), "This computer can't add" );
-        }
+		[Test]
+		void AssumeWithMessage()
+		{
+			Assume::That( 2 + 2, Is::EqualTo( 4 ), "This computer can't add" );
+		}
 	};
 }
