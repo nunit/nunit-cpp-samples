@@ -1,6 +1,7 @@
 using namespace NUnit::Framework;
 using NUnit::Framework::Is;
 using NUnit::Framework::Has;
+using namespace NUnit::Framework::Legacy;
 
 using System::String;
 
@@ -228,9 +229,11 @@ namespace NUnitSamples
 			Assert::That(gcnew array<String^> {"HELLO", "Hello", "hello" },
 				Is::All->EqualTo( "hello" )->IgnoreCase);
 
-			//Only available using new syntax
-				EqualTo(gcnew array<Object^> { "HELLO", "WORLD" })->IgnoreCase);
-				All->EqualTo( "hello" )->IgnoreCase);
+			
+			Assert::That(gcnew array<String^> { "Hello", "World" }, 
+				Is::EqualTo(gcnew array<Object^> { "HELLO", "WORLD" })->IgnoreCase);
+			Assert::That(gcnew array<String^> {"HELLO", "Hello", "hello" },
+				Is::All->EqualTo( "hello" )->IgnoreCase);
 		}
 
 		[Test]
@@ -386,8 +389,8 @@ namespace NUnitSamples
 			array<String^>^ sarray = { "a", "b", "c" };
 
 			// Classic syntax
-			Assert::Contains(3, iarray);
-			Assert::Contains("b", sarray);
+			ClassicAssert::Contains(3, iarray);
+			ClassicAssert::Contains("b", sarray);
 			CollectionAssert::Contains(iarray, 3);
 			CollectionAssert::Contains(sarray, "b");
 			CollectionAssert::DoesNotContain(sarray, "x");
@@ -513,10 +516,17 @@ namespace NUnitSamples
 		//    Assert::That(c, Is::All->Not);
 		//}
 
+		void ThrowsArgumentException()
+		{
+			throw gcnew System::ArgumentException();
+		}
+
 		[Test]
 		void ThrowsTests()
 		{
-			Assert::Throws(System::ArgumentException::typeid, gcnew TestDelegate(ThrowsArgumentException));
+			Assert::Throws(
+				System::ArgumentException::typeid,
+				gcnew System::Action(this, &ThrowsTests::ThrowsArgumentException));
 		}
 
 		static void ThrowsArgumentException()
@@ -533,7 +543,7 @@ namespace NUnitSamples
 		[Test]
 		void AssertPassWithMessageAndArguments()
 		{
-			ClassicAssert::Pass( "This test has passed at {0}", System::DateTime::Now );
+			Assert::Pass( "This test has passed at {0}", System::DateTime::Now );
 		}
 
 		[Test]
