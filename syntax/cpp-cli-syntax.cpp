@@ -524,14 +524,8 @@ namespace NUnitSamples
 		[Test]
 		void ThrowsTests()
 		{
-			Assert::Throws(
-				System::ArgumentException::typeid,
-				gcnew System::Action(this, &ThrowsTests::ThrowsArgumentException));
-		}
-
-		static void ThrowsArgumentException()
-		{
-			throw gcnew System::ArgumentException();
+			Assert::Throws<System::ArgumentException^>(
+				gcnew System::Action(this, &AssertSyntaxTests::ThrowsArgumentException));
 		}
 
 		[Test]
@@ -543,7 +537,7 @@ namespace NUnitSamples
 		[Test]
 		void AssertPassWithMessageAndArguments()
 		{
-			Assert::Pass( "This test has passed at {0}", System::DateTime::Now );
+			Assert::Pass( String::Format( "This test has passed at {0}", System::DateTime::Now ) );
 		}
 
 		[Test]
