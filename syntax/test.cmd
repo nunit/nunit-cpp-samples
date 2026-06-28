@@ -19,14 +19,12 @@ if exist "C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\Com
 echo Using: %VSTEST_PATH%
 echo.
 
-REM Check if the test assembly exists (try x64 first, then Debug)
+REM Check if the test assembly exists
 set TEST_DLL=
-if exist "x64\Debug\cpp-cli-syntax.dll" (
-    set "TEST_DLL=x64\Debug\cpp-cli-syntax.dll"
-) else if exist "Debug\cpp-cli-syntax.dll" (
+if exist "Debug\cpp-cli-syntax.dll" (
     set "TEST_DLL=Debug\cpp-cli-syntax.dll"
 ) else (
-    echo ERROR: cpp-cli-syntax.dll not found in x64\Debug or Debug
+    echo ERROR: cpp-cli-syntax.dll not found in Debug
     echo Please run build.cmd first
     exit /b 1
 )
