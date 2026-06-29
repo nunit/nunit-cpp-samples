@@ -11,6 +11,7 @@ This page documents the specific failures that occur when setting up C++/CLI NUn
 3. [FileNotFoundException: Microsoft.Extensions.DependencyModel](#filenotfoundexception-microsoftextensionsdependencymodel)
 4. [Build syntax errors after upgrading to NUnit 4/5](#build-syntax-errors-after-upgrading-to-nunit-45)
 5. [DLLs missing after incremental build](#dlls-missing-after-incremental-build)
+6. [Red squiggles and false errors in Visual Studio](#red-squiggles-and-false-errors-in-visual-studio)
 
 ---
 
@@ -248,3 +249,56 @@ copy /Y "%USERPROFILE%\.nuget\packages\microsoft.extensions.dependencymodel\8.0.
 ```
 
 This is safe to do unconditionally — `copy /Y` is idempotent and fast.
+
+---
+
+## Red squiggles and false errors in Visual Studio
+
+**Symptom**
+
+The editor underlines NUnit assertion code in red, and the Error List shows messages like:
+
+```
+'Within' is not a member of '...'
+'IgnoreCase' is not a member of '...'
+'AreEqual' : is not a member of 'NUnit::Framework::Assert'
+C4642: could not import the constraints for generic parameter 'T'
+```
+
+**Root cause**
+
+These are IntelliSense analysis errors, not compiler errors. The Visual Studio C++/CLI IntelliSense engine cannot fully model:
+
+- NUnit's generic type constraints on fluent chains (`->Within()`, `->IgnoreCase`)
+- C# extension methods (used by NUnit 4/5 for the classic assert API on `Assert`)
+
+**Fix**
+
+There is no fix — these are inherent limitations of the C++/CLI IntelliSense engine with NUnit's generic API design.
+
+For the classic assert methods specifically, the situation is:
+
+- **NUnit 4** moved them from `Assert` to `NUnit.Framework.Legacy.ClassicAssert`
+- **NUnit 5** added them back onto `Assert` — but as **C# static extension methods** that simply call through to `ClassicAssert`
+
+C++/CLI cannot call C# extension methods, so `Assert::AreEqual` etc. remain invisible. Use `ClassicAssert` directly:
+
+```cpp
+using namespace NUnit::Framework::Legacy;
+
+// Wrong — AreEqual is a C# extension method on Assert in NUnit 5, invisible to C++/CLI
+Assert::AreEqual(4, 2 + 2);
+
+// Correct — call ClassicAssert directly, bypassing the extension method layer
+ClassicAssert::AreEqual(4, 2 + 2);
+```
+
+For fluent constraint chains, trust `build.cmd` over the editor. If the build succeeds, the code is correct:
+
+```cpp
+// May show red in editor — compiles and runs fine
+Assert::That(4.99, Is::EqualTo(5.0)->Within(0.05));
+Assert::That(phrase, Does::Contain("WORLD")->IgnoreCase);
+```
+
+> **Rule of thumb:** Red squiggles in the editor = ignore. Errors in `build.cmd` output = fix.

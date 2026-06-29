@@ -74,7 +74,7 @@
             <TargetMachine>MachineX64</TargetMachine>
         </Link>
         <PostBuildEvent>
-            <Command>copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\microsoft.extensions.dependencymodel\8.0.0\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
+            <Command>copy /Y "$(USERPROFILE)\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\microsoft.extensions.dependencymodel\8.0.0\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -91,7 +91,7 @@
             <TargetMachine>MachineX64</TargetMachine>
         </Link>
         <PostBuildEvent>
-            <Command>copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "C:\Users\TerjeSandstrom\.nuget\packages\microsoft.extensions.dependencymodel\8.0.0\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
+            <Command>copy /Y "$(USERPROFILE)\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\microsoft.extensions.dependencymodel\8.0.0\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemGroup>
@@ -113,20 +113,20 @@
     </ItemGroup>
     <ItemGroup>
         <Reference Include="nunit.framework">
-            <HintPath>C:\Users\TerjeSandstrom\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.dll</HintPath>
+            <HintPath>$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.dll</HintPath>
             <Private>true</Private>
         </Reference>
 
         <Reference Include="nunit.framework.legacy">
-            <HintPath>C:\Users\TerjeSandstrom\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll</HintPath>
+            <HintPath>$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll</HintPath>
             <Private>true</Private>
         </Reference>
         <Reference Include="Microsoft.VisualStudio.TestPlatform.TestHost">
-            <HintPath>C:\Users\TerjeSandstrom\.nuget\packages\microsoft.testplatform.testhost\18.7.0\lib\net8.0\testhost.dll</HintPath>
+            <HintPath>$(USERPROFILE)\.nuget\packages\microsoft.testplatform.testhost\18.7.0\lib\net8.0\testhost.dll</HintPath>
             <Private>true</Private>
         </Reference>
         <Reference Include="System.Security.Permissions">
-            <HintPath>C:\Users\TerjeSandstrom\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll</HintPath>
+            <HintPath>$(USERPROFILE)\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll</HintPath>
             <Private>true</Private>
         </Reference>
     </ItemGroup>

@@ -2,7 +2,7 @@
 
 This guide shows how to set up a C++/CLI project that runs NUnit tests under the modern .NET Core runtime (net8.0). It covers every piece of the puzzle — project configuration, package references, build scripts, and the dependency chain — along with the non-obvious pitfalls that are not documented anywhere else.
 
-> **Why this guide exists:** As of 2025, the combination of NUnit 5 + NUnit3TestAdapter 6.x + C++/CLI on .NET Core is barely documented. This is a working recipe derived from a real project.
+> **Why this guide exists:** As of 2026, the combination of NUnit 5 + NUnit3TestAdapter 6.x + C++/CLI on .NET Core is barely documented. This is a working recipe derived from a real project.
 
 ---
 
@@ -15,10 +15,12 @@ This guide shows how to set up a C++/CLI project that runs NUnit tests under the
 5. [Package and Assembly References](#package-and-assembly-references)
 6. [Post-Build: Copying Runtime Dependencies](#post-build-copying-runtime-dependencies)
 7. [Writing Tests](#writing-tests)
-8. [Build Script](#build-script)
-9. [Test Runner Script](#test-runner-script)
-10. [How the Test Pipeline Works](#how-the-test-pipeline-works)
-11. [NUnit Syntax Styles](#nunit-syntax-styles)
+8. [NUnit Syntax Styles](#nunit-syntax-styles)
+9. [Classic Asserts and the Legacy Namespace](#classic-asserts-and-the-legacy-namespace)
+10. [Visual Studio IntelliSense False Positives](#visual-studio-intellisense-false-positives)
+11. [Build Script](#build-script)
+12. [Test Runner Script](#test-runner-script)
+13. [How the Test Pipeline Works](#how-the-test-pipeline-works)
 
 ---
 
@@ -378,6 +380,95 @@ graph LR
     E --> L[Contain / StartWith / EndWith]
     E --> M[Match regex]
 ```
+
+---
+
+## Classic Asserts and the Legacy Namespace
+
+The classic assertion methods (`AreEqual`, `IsNull`, `IsTrue`, etc.) have moved around across NUnit versions:
+
+| NUnit version | Where classic asserts live |
+|---|---|
+| v3 | Directly on `Assert` |
+| v4 | Moved to `NUnit.Framework.Legacy.ClassicAssert`; removed from `Assert` |
+| v5 | Still in `ClassicAssert`, but also re-exposed on `Assert` as **static extension methods** that simply route the call to `ClassicAssert` |
+
+In NUnit 5 the extension methods on `Assert` are syntax sugar — they exist to make migration easier for C# developers, who can keep writing `Assert.AreEqual(...)` without changing their code. Under the hood they just call `ClassicAssert.AreEqual(...)`.
+
+**C++/CLI does not support C# extension methods.** The compiler does not see them, IntelliSense does not resolve them, and they cannot be called. This means you cannot write:
+
+```cpp
+// Does NOT compile in C++/CLI — AreEqual is an extension method on Assert in NUnit 5
+Assert::AreEqual(4, 2 + 2);
+Assert::IsNull(nada);
+```
+
+You must call `ClassicAssert` directly instead:
+
+```cpp
+using namespace NUnit::Framework::Legacy;
+
+ClassicAssert::AreEqual(4, 2 + 2);
+ClassicAssert::IsNull(nada);
+ClassicAssert::IsTrue(2 + 2 == 4);
+ClassicAssert::Greater(7, 3);
+ClassicAssert::IsEmpty(gcnew array<bool>(0));
+ClassicAssert::Contains(3, iarray);
+```
+
+Similarly, `StringAssert` and `CollectionAssert` remain available directly — they were not moved to the legacy namespace:
+
+```cpp
+StringAssert::Contains("World", phrase);
+StringAssert::StartsWith("Hello", phrase);
+CollectionAssert::Contains(iarray, 3);
+CollectionAssert::AreEquivalent(gcnew array<int> { 2, 1, 4, 3, 5 }, ints1to5);
+```
+
+The required `using` directive at the top of your `.cpp` file:
+
+```cpp
+using namespace NUnit::Framework::Legacy;
+```
+
+---
+
+## Visual Studio IntelliSense False Positives
+
+When viewing C++/CLI NUnit test code in Visual Studio, the editor underlines some code in red and reports errors in the **Error List** panel. These are **false positives** — the code compiles and runs correctly. The MSBuild compiler (`cl.exe /clr:netcore`) handles this code fine; the errors come from the IntelliSense and Roslyn analysis layer, which has incomplete understanding of C++/CLI's interaction with .NET generics and extension methods.
+
+### What causes the false positives
+
+The C++/CLI IntelliSense engine cannot fully resolve:
+
+- **NUnit generic constraints on `Is::`, `Has::`, `Does::`** — The NUnit framework uses C# generic type constraints that the C++/CLI compiler imports with a C4642 warning and that IntelliSense cannot model precisely. You will see red squiggles on constraint chains like `Is::Not->EqualTo(5)`.
+- **Fluent chaining (`.Within()`, `.IgnoreCase`)** — These return types are constrained generics. The IDE cannot infer the return type of each step in the chain, so it marks subsequent calls as unresolved.
+- **Extension methods** — C# extension methods are not a C++/CLI language feature. Where NUnit 4/5 uses extension methods (e.g., the classic assert methods on `Assert`), IntelliSense will show them as missing even though the equivalent functionality is available via `ClassicAssert`.
+
+### Example
+
+```cpp
+// These lines may be red in the editor — they compile and pass at runtime
+Assert::That(4.99L, Is::EqualTo(5.0L)->Within(0.05L));
+Assert::That(phrase, Does::Contain("WORLD")->IgnoreCase);
+Assert::That(strings, Is::All->Contain("b"));
+```
+
+### What to ignore
+
+| Error / warning in IDE | Reality |
+|---|---|
+| `'Within' is not a member of '...'` | Compiles fine; generic return type not resolvable by IntelliSense |
+| `'IgnoreCase' is not a member of '...'` | Same — fluent chaining on a generic constraint |
+| `'Contain' : is not a member of 'NUnit::Framework::ConstraintExpression'` | Same |
+| `C4642: could not import the constraints for generic parameter 'T'` | MSBuild warning from NUnit's generic internals; harmless |
+| Classic assert methods shown as missing on `Assert::` | In NUnit 5 they are extension methods on `Assert` — invisible to C++/CLI. Use `ClassicAssert::` directly — see [Classic Asserts](#classic-asserts-and-the-legacy-namespace) |
+
+### What is a real error
+
+If `msbuild` reports an error (not just IntelliSense), that is real. Always treat **MSBuild output** as authoritative — if the build succeeds, the code is correct regardless of what the editor shows.
+
+> **Rule of thumb:** Red squiggles in the editor = ignore. Errors in `build.cmd` output = fix.
 
 ---
 

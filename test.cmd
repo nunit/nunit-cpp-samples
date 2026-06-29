@@ -21,10 +21,10 @@ echo.
 
 REM Check if the test assembly exists
 set TEST_DLL=
-if exist "Debug\cpp-cli-syntax.dll" (
-    set "TEST_DLL=Debug\cpp-cli-syntax.dll"
+if exist "syntax\Debug\cpp-cli-syntax.dll" (
+    set "TEST_DLL=syntax\Debug\cpp-cli-syntax.dll"
 ) else (
-    echo ERROR: cpp-cli-syntax.dll not found in Debug
+    echo ERROR: cpp-cli-syntax.dll not found in syntax\Debug
     echo Please run build.cmd first
     exit /b 1
 )

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install VS 2026 Build Tools (v145 toolset with C++/CLI support)
+        shell: pwsh
+        run: |
+          $installer = "$env:TEMP\vs_buildtools.exe"
+          Invoke-WebRequest -Uri "https://aka.ms/vs/18/release/vs_buildtools.exe" -OutFile $installer
+          $process = Start-Process -FilePath $installer -Wait -PassThru -ArgumentList @(
+            "--quiet", "--wait", "--norestart", "--nocache",
+            "--add", "Microsoft.VisualStudio.Workload.VCTools",
+            "--add", "Microsoft.VisualStudio.Component.VC.CLI.Support",
+            "--includeRecommended"
+          )
+          # 0 = success, 3010 = success but reboot required (normal in CI)
+          if ($process.ExitCode -notin @(0, 3010)) {
+            throw "VS 2026 Build Tools installation failed (exit code $($process.ExitCode))"
+          }
+
+      - name: Setup MSBuild (VS 2026 / v18)
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: '[18.0,19.0)'
+
+      - name: Restore NuGet packages
+        run: nuget restore syntax\cpp-cli-syntax.vcxproj
+
+      - name: Build
+        run: .\build.cmd
+
+      - name: Test
+        run: .\test.cmd
