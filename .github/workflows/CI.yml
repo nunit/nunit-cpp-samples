@@ -18,7 +18,7 @@ jobs:
         shell: pwsh
         run: |
           $installer = "$env:TEMP\vs_buildtools.exe"
-          Invoke-WebRequest -Uri "https://aka.ms/vs/18/release/vs_buildtools.exe" -OutFile $installer
+          curl.exe -L -o $installer "https://aka.ms/vs/18/release/vs_buildtools.exe"
           $process = Start-Process -FilePath $installer -Wait -PassThru -ArgumentList @(
             "--quiet", "--wait", "--norestart", "--nocache",
             "--add", "Microsoft.VisualStudio.Workload.VCTools",
