@@ -16,6 +16,7 @@
         <Keyword>NetCoreCProj</Keyword>
         <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
         <TargetFramework>net8.0</TargetFramework>
+        <_EnablePackageReferencesInVCProjects>true</_EnablePackageReferencesInVCProjects>
     </PropertyGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -62,6 +63,7 @@
             <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <WarningLevel>Level3</WarningLevel>
+            <DisableSpecificWarnings>4945</DisableSpecificWarnings>
             <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -74,7 +76,7 @@
             <TargetMachine>MachineX64</TargetMachine>
         </Link>
         <PostBuildEvent>
-            <Command>copy /Y "$(USERPROFILE)\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\microsoft.extensions.dependencymodel\8.0.0\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
+            <Command>copy /Y "$(USERPROFILE)\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.22\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\microsoft.extensions.dependencymodel\8.0.2\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,6 +84,7 @@
             <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
             <WarningLevel>Level3</WarningLevel>
+            <DisableSpecificWarnings>4945</DisableSpecificWarnings>
             <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
         </ClCompile>
         <Link>
@@ -91,12 +94,12 @@
             <TargetMachine>MachineX64</TargetMachine>
         </Link>
         <PostBuildEvent>
-            <Command>copy /Y "$(USERPROFILE)\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\microsoft.extensions.dependencymodel\8.0.0\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
+            <Command>copy /Y "$(USERPROFILE)\.nuget\packages\nunit3testadapter\6.2.0\build\net8.0\*.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.22\lib\net8.0\nunit.framework.legacy.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\system.security.permissions\9.0.0\lib\net8.0\System.Security.Permissions.dll" "$(OutDir)" &amp; copy /Y "$(USERPROFILE)\.nuget\packages\microsoft.extensions.dependencymodel\8.0.2\lib\net8.0\Microsoft.Extensions.DependencyModel.dll" "$(OutDir)"</Command>
         </PostBuildEvent>
     </ItemDefinitionGroup>
     <ItemGroup>
         <PackageReference Include="NUnit">
-            <Version>5.0.0-alpha.100.20</Version>
+            <Version>5.0.0-alpha.100.22</Version>
         </PackageReference>
         <PackageReference Include="NUnit3TestAdapter">
             <Version>6.2.0</Version>
@@ -108,17 +111,17 @@
             <Version>9.0.0</Version>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyModel">
-            <Version>8.0.0</Version>
+            <Version>8.0.2</Version>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
         <Reference Include="nunit.framework">
-            <HintPath>$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.dll</HintPath>
+            <HintPath>$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.22\lib\net8.0\nunit.framework.dll</HintPath>
             <Private>true</Private>
         </Reference>
 
         <Reference Include="nunit.framework.legacy">
-            <HintPath>$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.20\lib\net8.0\nunit.framework.legacy.dll</HintPath>
+            <HintPath>$(USERPROFILE)\.nuget\packages\nunit\5.0.0-alpha.100.22\lib\net8.0\nunit.framework.legacy.dll</HintPath>
             <Private>true</Private>
         </Reference>
         <Reference Include="Microsoft.VisualStudio.TestPlatform.TestHost">

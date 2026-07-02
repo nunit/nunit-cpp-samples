@@ -18,19 +18,13 @@ This guide explains the CI workflow for building and testing the C++/CLI NUnit p
 
 ## Why CI is non-trivial for C++/CLI
 
-Running a standard `dotnet test` or `msbuild` job on a GitHub-hosted runner fails for this project for one specific reason: the project requires the **v145 platform toolset**, which ships with Visual Studio 2026. The standard `windows-latest` runner image ships Visual Studio 2022 (toolset v143), not VS 2026.
+The project requires the **v145 platform toolset**, which ships with Visual Studio 2026. Earlier versions of the `windows-latest` runner image shipped only Visual Studio 2022 (toolset v143), which caused an immediate build failure:
 
-```mermaid
-graph LR
-    A["windows-latest runner<br/>(VS 2022 / v143)"]
-    B["cpp-cli-syntax.vcxproj<br/>PlatformToolset = v145"]
-    C["MSB8020: Build tools<br/>for v145 not found"]
-    A -->|tries to build| B --> C
-
-    style C fill:#ffcdd2,stroke:#c62828
+```
+error MSB8020: The build tools for Visual Studio 2026 (Platform Toolset = 'v145') cannot be found.
 ```
 
-The solution is to install the VS 2026 Build Tools at the start of the job. This adds time to each run but is reliable and self-contained — no custom runner images or self-hosted runners are needed.
+As of the `windows-2025-vs2026` runner image (released June 2026), **`windows-latest` now includes VS 2026**, so no extra installation step is needed. The only requirement is pointing `setup-msbuild` at the right VS version.
 
 ---
 
@@ -38,15 +32,13 @@ The solution is to install the VS 2026 Build Tools at the start of the job. This
 
 | Requirement | What provides it | Notes |
 |---|---|---|
-| `windows-latest` runner | GitHub-hosted | Windows Server 2022, has VS 2022 pre-installed |
-| v145 C++ compiler | VS 2026 Build Tools (installed in CI) | `cl.exe /clr:netcore` |
-| C++/CLI support (`/clr:netcore`) | `VC.CLI.Support` component | Required for mixed-mode assembly |
-| MSBuild v18 | VS 2026 Build Tools (installed in CI) | Set up via `microsoft/setup-msbuild@v2` |
+| `windows-latest` runner | GitHub-hosted | Windows Server 2025 with VS 2026 pre-installed (`windows-2025-vs2026` image) |
+| v145 C++ compiler | VS 2026 (pre-installed on runner) | `cl.exe /clr:netcore` |
+| C++/CLI support (`/clr:netcore`) | VS 2026 (pre-installed on runner) | Required for mixed-mode assembly |
+| MSBuild v18 | VS 2026 (pre-installed on runner) | Selected via `microsoft/setup-msbuild@v2` |
 | NuGet CLI | Pre-installed on runner | Used to restore packages |
 | .NET 8 runtime | Pre-installed on runner | Required by testhost at test time |
-| `vstest.console.exe` | VS 2022 (pre-installed on runner) | `test.cmd` finds VS 2022 path |
-
-> **Note on `vstest.console.exe`:** The test runner (`test.cmd`) checks for VS 2026 first, then falls back to VS 2022. On the CI runner, VS 2022's vstest is used, which is fine — vstest compatibility is independent of the build toolset.
+| `vstest.console.exe` | VS 2026 (pre-installed on runner) | `test.cmd` checks VS 2026 path first |
 
 ---
 
@@ -70,22 +62,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install VS 2026 Build Tools (v145 toolset with C++/CLI support)
-        shell: pwsh
-        run: |
-          $installer = "$env:TEMP\vs_buildtools.exe"
-          Invoke-WebRequest -Uri "https://aka.ms/vs/18/release/vs_buildtools.exe" -OutFile $installer
-          $process = Start-Process -FilePath $installer -Wait -PassThru -ArgumentList @(
-            "--quiet", "--wait", "--norestart", "--nocache",
-            "--add", "Microsoft.VisualStudio.Workload.VCTools",
-            "--add", "Microsoft.VisualStudio.Component.VC.CLI.Support",
-            "--includeRecommended"
-          )
-          # 0 = success, 3010 = success but reboot required (normal in CI)
-          if ($process.ExitCode -notin @(0, 3010)) {
-            throw "VS 2026 Build Tools installation failed (exit code $($process.ExitCode))"
-          }
 
       - name: Setup MSBuild (VS 2026 / v18)
         uses: microsoft/setup-msbuild@v2
@@ -117,42 +93,7 @@ Standard checkout. No special configuration needed — the project has no submod
 
 ---
 
-### 2. Install VS 2026 Build Tools
-
-```yaml
-- name: Install VS 2026 Build Tools (v145 toolset with C++/CLI support)
-  shell: pwsh
-  run: |
-    $installer = "$env:TEMP\vs_buildtools.exe"
-    Invoke-WebRequest -Uri "https://aka.ms/vs/18/release/vs_buildtools.exe" -OutFile $installer
-    $process = Start-Process -FilePath $installer -Wait -PassThru -ArgumentList @(
-      "--quiet", "--wait", "--norestart", "--nocache",
-      "--add", "Microsoft.VisualStudio.Workload.VCTools",
-      "--add", "Microsoft.VisualStudio.Component.VC.CLI.Support",
-      "--includeRecommended"
-    )
-    if ($process.ExitCode -notin @(0, 3010)) {
-      throw "VS 2026 Build Tools installation failed (exit code $($process.ExitCode))"
-    }
-```
-
-**What it does:** Downloads the VS 2026 Build Tools bootstrapper from Microsoft's official short URL (`aka.ms/vs/18/release/vs_buildtools.exe`) and installs the minimum set of components needed to compile a C++/CLI .NET Core project. See [VS 2026 Build Tools components](#vs-2026-build-tools-components) for details on each component.
-
-**The exit code check:** The VS installer returns different codes depending on outcome:
-
-| Exit code | Meaning |
-|---|---|
-| `0` | Installation succeeded |
-| `3010` | Succeeded, but a reboot is required — safe to ignore in CI |
-| Any other | Installation failed |
-
-**Why `Start-Process -Wait`:** The VS bootstrapper spawns a second installer process. Using `Start-Process -Wait -PassThru` waits for the entire installer chain to complete and captures the final exit code. Without `-Wait` the step would complete before installation finishes.
-
-**Why `--nocache`:** Skips caching downloaded packages to disk, reducing disk usage on the ephemeral runner.
-
----
-
-### 3. Setup MSBuild
+### 2. Setup MSBuild
 
 ```yaml
 - name: Setup MSBuild (VS 2026 / v18)
@@ -178,7 +119,7 @@ graph LR
 
 ---
 
-### 4. Restore NuGet packages
+### 3. Restore NuGet packages
 
 ```yaml
 - name: Restore NuGet packages
@@ -197,7 +138,7 @@ If the packages are not restored first, MSBuild cannot find the assemblies and c
 
 ---
 
-### 5. Build
+### 4. Build
 
 ```yaml
 - name: Build
@@ -210,7 +151,7 @@ See [build.cmd](../build.cmd) and the [Setup Guide](cpp-cli-nunit-guide.md#post-
 
 ---
 
-### 6. Test
+### 5. Test
 
 ```yaml
 - name: Test
@@ -260,16 +201,13 @@ Components that are **not** installed (and not needed):
 | Step | Typical duration |
 |---|---|
 | Checkout | < 1 min |
-| Install VS 2026 Build Tools | 8–15 min |
 | Setup MSBuild | < 1 min |
 | Restore NuGet packages | 1–3 min (cold cache) |
 | Build | 1–2 min |
 | Test | < 1 min |
-| **Total** | **~12–22 min** |
+| **Total** | **~3–6 min** |
 
-The VS 2026 Build Tools installation dominates the total time. This cost is paid on every run because GitHub-hosted runners are ephemeral — nothing persists between jobs.
-
-> **Reducing install time:** GitHub Actions supports caching via `actions/cache`. However, caching a VS Build Tools installation is complex (the install path contains many files and registry entries). For a project of this size the 10–15 minute overhead is acceptable. If build times become a concern, a self-hosted Windows runner with VS 2026 pre-installed eliminates this step entirely.
+Because VS 2026 is pre-installed on the runner, there is no lengthy tooling installation step. The NuGet restore dominates on cold cache runs.
 
 ---
 
@@ -281,11 +219,7 @@ The VS 2026 Build Tools installation dominates the total time. This cost is paid
 error MSB8020: The build tools for Visual Studio 2026 (Platform Toolset = 'v145') cannot be found.
 ```
 
-The VS 2026 Build Tools installation step either failed or the `setup-msbuild` action picked up VS 2022 instead of VS 2026. Check:
-
-1. The installer step exit code — if non-zero, the download or install failed
-2. That `vs-version: '[18.0,19.0)'` is present on the `setup-msbuild` step
-3. The `microsoft/setup-msbuild@v2` action version — older versions may not support the `vs-version` input
+The `setup-msbuild` action picked up VS 2022 instead of VS 2026. Check that `vs-version: '[18.0,19.0)'` is present on the `setup-msbuild` step and that `microsoft/setup-msbuild@v2` is used (older versions may not support the `vs-version` input). If the runner image ever reverts to VS 2022 only, check the runner image name in the job log header — it should say `windows-2025-vs2026`.
 
 ### NuGet restore fails on pre-release package
 
@@ -310,7 +244,7 @@ The NuGet CLI on the runner may not be searching pre-release versions. Add a `nu
 ERROR: Could not find vstest.console.exe
 ```
 
-The `test.cmd` checks for VS 2026 and VS 2022 Enterprise paths. GitHub-hosted runners install VS 2022 **Enterprise**, so the path should exist. If the runner image changes the install location, update `test.cmd` to add the new path. You can find it on the runner with:
+The `test.cmd` checks for VS 2026 Enterprise paths. The `windows-2025-vs2026` runner image installs VS 2026 **Enterprise**, so the path should exist. If the runner image changes the install location, update `test.cmd` to add the new path. You can find it on the runner with:
 
 ```powershell
 vswhere -latest -find **\vstest.console.exe
